@@ -40,4 +40,5 @@ class LogRecord(BaseModel):
     cost_usd: float | None = None
     error_type: str | None = None
     tool_name: str | None = None
+    quality_score: float | None = None
     payload: dict[str, Any] | None = None

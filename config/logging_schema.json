@@ -19,6 +19,7 @@
     "cost_usd": {"type": ["number", "null"]},
     "error_type": {"type": ["string", "null"]},
     "tool_name": {"type": ["string", "null"]},
+    "quality_score": {"type": ["number", "null"]},
     "payload": {"type": ["object", "null"]}
   }
 }
