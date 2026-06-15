@@ -12,7 +12,7 @@
 ## 2. Group Performance (Auto-Verified)
 - [VALIDATE_LOGS_FINAL_SCORE]: 100/100
 - [TOTAL_TRACES_COUNT]: 10+ traces sau khi chạy `scripts/load_test.py --concurrency 5` và flush bằng `/tracing/flush`
-![alt text](docs/images/image.png)
+![alt text](docs/images/1.png)
 - [PII_LEAKS_FOUND]: 0
 
 ---
@@ -21,16 +21,17 @@
 
 ### 3.1 Logging & Tracing
 - [EVIDENCE_CORRELATION_ID_SCREENSHOT]:
-![alt text](docs/images/dashboard_main.png)
+![alt text](docs/images/1.png)
 - [EVIDENCE_PII_REDACTION_SCREENSHOT]:
-![alt text](docs/images/dashboard_main.png)
+![alt text](docs/images/1.png)
 - [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]:
-![alt text](docs/images/dashboard_main.png)
+![alt text](docs/images/1.png)
 - [TRACE_WATERFALL_EXPLANATION]: Trace chính là `chat-request`, bên trong có observation `agent-run`, `rag-retrieve` và `fake-llm-generate`. `rag-retrieve` cho biết số tài liệu được truy xuất và preview đã scrub PII; `fake-llm-generate` ghi model `claude-sonnet-4-5`, token input/output và answer preview. Trace metadata có `correlation_id` để đối chiếu với JSON logs, `session_id` để gom hội thoại, `user_id` đã hash để tránh lộ định danh thật, và tags `lab`, `feature`, `model`, `env` để filter trong Langfuse.
 
 ### 3.2 Dashboard & SLOs
 - [DASHBOARD_6_PANELS_SCREENSHOT]:
-![alt text](docs/images/dashboard_main.png)
+![alt text](docs/images/3.png)
+![alt text](docs/images/2.png)
 - [SLO_TABLE]:
 | SLI | Target | Window | Current Value |
 |---|---:|---|---:|
@@ -49,18 +50,16 @@
 - [SCENARIO_NAME]: rag_slow
 - [SYMPTOMS_OBSERVED]: Latency P95 tăng trên dashboard, request `/chat` phản hồi chậm, trace waterfall có `agent-run` và `rag-retrieve` dài hơn bình thường.
 - [ROOT_CAUSE_PROVED_BY]:
-![[Pasted image 20260615162145.png]]
+![!\[\[Pasted image 20260615162145.png\]](docs/images/4.png)
 
 - [FIX_ACTION]: Tắt incident bằng `python scripts/inject_incident.py --scenario rag_slow --disable` hoặc endpoint disable tương ứng, sau đó chạy lại load test để xác nhận latency giảm.
-- [PREVENTIVE_MEASURE]: Duy trì alert `high_latency_p95`, kiểm tra top slow traces trong 1h, so sánh `rag-retrieve` với `fake-llm-generate`, và cập nhật runbook xử lý RAG chậm.
-
+- [PREVENTIVE_MEASURE]: Duy trì alert `high_latency_p95`, kiểm tra top slow traces trong 1h, so sánh `rag-retrieve` với `fake-llm-generate`, và cập nhật runbook xử lý RAG chậm
 ---
 
 ## 5. Individual Contributions & Evidence
 
 ### 2A202600772 - Vũ Tuấn Phương
 - [TASKS_COMPLETED]: Hoàn thiện Logging & PII: triển khai correlation ID middleware, bind contextvars cho log API, hash `user_id`, ghi `session_id`, `feature`, `model`, `env`, bật processor scrub PII trước khi ghi JSONL, mở rộng regex cho email, số điện thoại Việt Nam, CCCD, thẻ tín dụng, passport và từ khóa địa chỉ Việt Nam. Hoàn thiện Langfuse tracing theo best practices: cài Langfuse skill, nâng SDK lên `langfuse==4.7.1`, load `.env` trước khi import SDK, tạo root span `chat-request`, nested observations `agent-run`, `rag-retrieve`, `fake-llm-generate`, truyền token usage/model/cost/correlation_id, scrub input/output preview trước khi gửi lên Langfuse, thêm endpoint `/tracing/flush`. Hoàn thiện dashboard 6 panels tại `/dashboard`: Latency P50/P95/P99, Traffic, Error Rate, Cost, Tokens in/out, Quality proxy.
-- [EVIDENCE_LINK]: https://github.com/xdgopen/2A202600581-NguyenDanhThanh-Day13/pull/1
 
 ---
 
